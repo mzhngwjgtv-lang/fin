@@ -137,7 +137,12 @@
     border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--border);
+    background: #0f172a;
     box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
   }
 
   .hero-banner-img {
@@ -325,7 +330,7 @@
     color: var(--accent);
   }
 
-  /* Блок раздаточного материала pic2.jpeg */
+  /* Блок материалов (pic2.jpeg) */
   .materials-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
@@ -405,7 +410,12 @@
     border: 1px solid var(--border);
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    background: #0f172a;
     transition: transform 0.25s ease;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .materials-preview:hover {
@@ -430,7 +440,7 @@
     backdrop-filter: blur(4px);
   }
 
-  /* Автономный симулятор (Занятие 1) */
+  /* Автономный симулятор */
   .simulator-wrapper {
     background: var(--bg-surface);
     border: 1px solid var(--border);
@@ -589,7 +599,7 @@
     background: #7dd3fc;
   }
 
-  /* Просмотр полноразмерного изображения (LightBox) */
+  /* Просмотр изображения (Lightbox) */
   .image-lightbox {
     position: fixed;
     top: 0;
@@ -786,9 +796,14 @@
   <h1>Финансовая безопасность и цифровая гигиена:<br>как не стать соучастником преступления</h1>
   <p>Практический интенсив для учащихся 8–11 классов и студентов 1–2 курсов СПО (14–18 лет). Распознавание признаков дропперства (ст. 187 УК РФ), ловушек на маркетплейсах и противодействие социальной инженерии.</p>
   
-  <!-- Вставка горизонтального баннера pic1.jpeg -->
-  <div class="hero-banner-container">
-    <img src="pic1.jpeg" alt="Финзащита: Кибербезопасность платежей" class="hero-banner-img">
+  <!-- Заглавный баннер с обработчиком -->
+  <div class="hero-banner-container" id="bannerContainer">
+    <img 
+      id="mainBannerImg"
+      src="./pic1.jpeg" 
+      alt="Финзащита: Кибербезопасность платежей" 
+      class="hero-banner-img"
+      onerror="resolveBanner(this)">
   </div>
 
   <div class="meta-grid">
@@ -854,23 +869,27 @@
   <!-- Панель детального описания занятия -->
   <div class="lesson-detail-panel" id="detail-panel"></div>
 
-  <!-- Блок методических материалов и раздатки к уроку 1 (pic2.jpeg) -->
+  <!-- Раздаточный материал (pic2.jpeg) -->
   <div class="materials-card" id="materials">
     <div class="materials-info">
       <span class="lesson-badge" style="background:#0284c7; color:#fff; margin-bottom:8px;">Раздаточный материал • Занятие 1</span>
       <h3>Карманный стоп-лист: три строгих «НЕЛЬЗЯ»</h3>
       <p>Овеществленный артефакт в портфолио ученика. Наглядная памятка с разбором правовых последствий передачи карт, транзитных переводов по СБП и развенчанием мифа о фиктивной утере пластика.</p>
       <div class="materials-actions">
-        <button class="btn-material btn-material-primary" onclick="openLightbox('pic2.jpeg')">
+        <button class="btn-material btn-material-primary" onclick="openCurrentLightbox()">
           🔍 Увеличить памятку
         </button>
-        <a href="pic2.jpeg" download="Stop-List-Dropping.jpeg" class="btn-material btn-material-outline">
-          📥 Скачать файл (JPEG)
+        <a id="downloadLink" href="./pic2.jpeg" download="Stop-List-Dropping.jpeg" class="btn-material btn-material-outline">
+          📥 Скачать файл
         </a>
       </div>
     </div>
-    <div class="materials-preview" onclick="openLightbox('pic2.jpeg')">
-      <img src="pic2.jpeg" alt="Карманный стоп-лист: три строгих НЕЛЬЗЯ">
+    <div class="materials-preview" onclick="openCurrentLightbox()">
+      <img 
+        id="matImg"
+        src="./pic2.jpeg" 
+        alt="Карманный стоп-лист: три строгих НЕЛЬЗЯ"
+        onerror="forceLoadMatImg(this)">
       <span class="preview-hover-tag">Нажмите для зума</span>
     </div>
   </div>
@@ -941,6 +960,43 @@
 </div>
 
 <script>
+/* ======================================================
+   КАСКАДНЫЙ ЗАГРУЗЧИК ИЗОБРАЖЕНИЙ
+====================================================== */
+const bannerUrls = [
+  './pic1.jpeg',
+  'pic1.jpeg',
+  'https://raw.githubusercontent.com/mzhngwjgtv-lang/fin/main/pic1.jpeg',
+  './pic1.jpg',
+  'pic1.jpg'
+];
+let bannerIdx = 0;
+
+function resolveBanner(img) {
+  if (bannerIdx < bannerUrls.length) {
+    img.src = bannerUrls[bannerIdx++];
+  }
+}
+
+const matUrls = [
+  './pic2.jpeg',
+  'pic2.jpeg',
+  'https://raw.githubusercontent.com/mzhngwjgtv-lang/fin/main/pic2.jpeg',
+  './pic2.jpg',
+  'pic2.jpg',
+  'https://raw.githubusercontent.com/mzhngwjgtv-lang/fin/main/pic2.jpg'
+];
+let matIdx = 0;
+
+function forceLoadMatImg(img) {
+  if (matIdx < matUrls.length) {
+    const nextUrl = matUrls[matIdx++];
+    img.src = nextUrl;
+    const dlBtn = document.getElementById('downloadLink');
+    if (dlBtn) dlBtn.href = nextUrl;
+  }
+}
+
 /* ======================================================
    ДАННЫЕ ПО 4 ЗАНЯТИЯМ
 ====================================================== */
@@ -1170,10 +1226,11 @@ renderSim();
 /* ======================================================
    ПРОСМОТР ИЗОБРАЖЕНИЙ (LIGHTBOX)
 ====================================================== */
-function openLightbox(imgSrc) {
+function openCurrentLightbox() {
+  const currentImgSrc = document.getElementById("matImg").src;
   const lb = document.getElementById("imageLightbox");
   const img = document.getElementById("lightboxImg");
-  img.src = imgSrc;
+  img.src = currentImgSrc;
   lb.classList.add("open");
 }
 
@@ -1189,9 +1246,6 @@ function toggleBotModal() {
   modal.classList.toggle("open");
 }
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
